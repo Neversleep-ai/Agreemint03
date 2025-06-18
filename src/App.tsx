@@ -5,17 +5,19 @@ import { useState } from "react"
 
 type View = "landing" | "intake" | "negotiation"
 
-export default function App() {
+const App = () => {
   const [currentView, setCurrentView] = useState<View>("landing")
 
-  if (currentView === "intake") {
-    return <IntakeForm onBack={() => setCurrentView("landing")} />
-  }
+  return (
+    <div>
+      {currentView === "landing" && <LandingPage setCurrentView={setCurrentView} />}
+      {currentView === "intake" && <IntakeForm setCurrentView={setCurrentView} />}
+      {currentView === "negotiation" && <NegotiationRoom setCurrentView={setCurrentView} />}
+    </div>
+  )
+}
 
-  if (currentView === "negotiation") {
-    return <NegotiationRoom onBack={() => setCurrentView("landing")} />
-  }
-
+const LandingPage = ({ setCurrentView }: { setCurrentView: (view: View) => void }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       <div className="max-w-6xl mx-auto p-6">
@@ -120,7 +122,7 @@ export default function App() {
   )
 }
 
-function IntakeForm({ onBack }: { onBack: () => void }) {
+const IntakeForm = ({ setCurrentView }: { setCurrentView: (view: View) => void }) => {
   const [projectDescription, setProjectDescription] = useState("")
   const [showAnalysis, setShowAnalysis] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -143,7 +145,7 @@ function IntakeForm({ onBack }: { onBack: () => void }) {
   if (showSuccess) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
-        <button onClick={onBack} className="mb-4 text-blue-600 hover:text-blue-800">
+        <button onClick={() => setCurrentView("landing")} className="mb-4 text-blue-600 hover:text-blue-800">
           ← Back to Demo
         </button>
         <div className="max-w-2xl mx-auto">
@@ -175,7 +177,7 @@ function IntakeForm({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <button onClick={onBack} className="mb-4 text-blue-600 hover:text-blue-800">
+      <button onClick={() => setCurrentView("landing")} className="mb-4 text-blue-600 hover:text-blue-800">
         ← Back to Demo
       </button>
 
@@ -343,7 +345,7 @@ function IntakeForm({ onBack }: { onBack: () => void }) {
   )
 }
 
-function NegotiationRoom({ onBack }: { onBack: () => void }) {
+const NegotiationRoom = ({ setCurrentView }: { setCurrentView: (view: View) => void }) => {
   const [messages, setMessages] = useState([
     {
       id: "1",
@@ -413,7 +415,7 @@ function NegotiationRoom({ onBack }: { onBack: () => void }) {
   if (viewMode === "mobile") {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
-        <button onClick={onBack} className="mb-4 text-blue-600 hover:text-blue-800">
+        <button onClick={() => setCurrentView("landing")} className="mb-4 text-blue-600 hover:text-blue-800">
           ← Back to Demo
         </button>
 
@@ -486,7 +488,7 @@ function NegotiationRoom({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <button onClick={onBack} className="mb-4 text-blue-600 hover:text-blue-800">
+      <button onClick={() => setCurrentView("landing")} className="mb-4 text-blue-600 hover:text-blue-800">
         ← Back to Demo
       </button>
 
@@ -645,3 +647,5 @@ function NegotiationRoom({ onBack }: { onBack: () => void }) {
     </div>
   )
 }
+
+export default App
