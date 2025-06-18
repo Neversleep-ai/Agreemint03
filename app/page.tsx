@@ -9,8 +9,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
 import {
   Loader2,
   Users,
@@ -25,13 +23,16 @@ import {
   ChevronRight,
   Monitor,
   Smartphone,
+  Sparkles,
+  Shield,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { cn } from "@/lib/utils" // Assuming cn is in lib/utils.ts
+import { cn } from "@/lib/utils"
+import type { NegotiationMessage } from "@/src/types"
 
-// --- START: StandaloneIntakeForm Code ---
+// Form validation schema
 const contractIntakeSchema = z.object({
   projectDescription: z.string().min(10, "Please describe your project in more detail"),
   userRole: z.enum(["client", "freelancer"], {
@@ -46,7 +47,138 @@ const contractIntakeSchema = z.object({
 
 type ContractIntakeFormValues = z.infer<typeof contractIntakeSchema>
 
-function LocalStandaloneIntakeForm({ onBack }: { onBack: () => void }) {
+// Mock contract sections
+const mockContractSections = [
+  { id: "1", title: "What We Are Creating", status: "discussing" as const, order: 1 },
+  { id: "2", title: "Our Project Timeline", status: "pending" as const, order: 2 },
+  { id: "3", title: "Investment & Returns", status: "pending" as const, order: 3 },
+  { id: "4", title: "Communication Standards", status: "pending" as const, order: 4 },
+  { id: "5", title: "Intellectual Property", status: "pending" as const, order: 5 },
+]
+
+type ViewMode = "landing" | "intake" | "negotiation"
+
+export default function ContractPlatformDemo() {
+  const [currentView, setCurrentView] = useState<ViewMode>("landing")
+
+  const handleBackToDemo = () => setCurrentView("landing")
+
+  if (currentView === "intake") {
+    return <IntakeFormComponent onBack={handleBackToDemo} />
+  }
+
+  if (currentView === "negotiation") {
+    return <NegotiationRoomComponent onBack={handleBackToDemo} />
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Agreemint</h1>
+          <p className="text-xl text-gray-600 mb-6">AI-assisted contract negotiation platform</p>
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            <Badge variant="secondary" className="bg-green-100 text-green-800">
+              🤝 AI-mediated negotiation
+            </Badge>
+            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+              ⚖️ Personal AI lawyers
+            </Badge>
+            <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+              ✍️ Sign in one session
+            </Badge>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setCurrentView("intake")}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="w-5 h-5 text-blue-600" />
+                Smart Intake Form
+              </CardTitle>
+              <CardDescription>AI-powered contract creation that detects the right template.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-sm text-gray-600 list-disc list-inside mb-4">
+                <li>AI template detection</li>
+                <li>Smart project analysis</li>
+                <li>Automated invitation system</li>
+              </ul>
+              <Button className="w-full">
+                Try Intake Form <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card
+            className="hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => setCurrentView("negotiation")}
+          >
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-purple-600" />
+                Negotiation Room
+              </CardTitle>
+              <CardDescription>Real-time AI-assisted negotiation with mobile-responsive design.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-sm text-gray-600 list-disc list-inside mb-4">
+                <li>Desktop & mobile views</li>
+                <li>AI mediator & lawyers</li>
+                <li>Section-by-section flow</li>
+              </ul>
+              <Button className="w-full">
+                Enter Negotiation Room <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="bg-white/50 backdrop-blur">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-green-600" />
+              How It Works
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {[
+                { icon: "📝", title: "Describe Project", desc: "AI analyzes needs & selects template." },
+                { icon: "🤝", title: "Enter Room", desc: "Both parties join AI-assisted room." },
+                { icon: "💬", title: "Negotiate", desc: "AI guides, lawyers protect interests." },
+                { icon: "✍️", title: "Sign", desc: "Digital signatures complete contract." },
+              ].map((step) => (
+                <div key={step.title} className="text-center">
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-xl">{step.icon}</span>
+                  </div>
+                  <h3 className="font-medium mb-1">{step.title}</h3>
+                  <p className="text-sm text-gray-600">{step.desc}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="text-center mt-12">
+          <p className="text-gray-600 mb-4">Ready to experience the future of contract negotiation?</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" onClick={() => setCurrentView("intake")}>
+              Start Your First Contract
+            </Button>
+            <Button size="lg" variant="outline" onClick={() => setCurrentView("negotiation")}>
+              See Negotiation Room
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function IntakeFormComponent({ onBack }: { onBack: () => void }) {
   const [detectedTemplate, setDetectedTemplate] = useState<"freelancer" | "agency" | null>(null)
   const [aiAnalysis, setAiAnalysis] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
@@ -144,7 +276,7 @@ function LocalStandaloneIntakeForm({ onBack }: { onBack: () => void }) {
         <p className="text-lg text-gray-600">
           Describe your project and we'll set up your AI-assisted negotiation room
         </p>
-        <div className="flex items-center justify-center gap-4 mt-4">
+        <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
           <Badge variant="secondary" className="bg-green-100 text-green-800">
             ✓ Your first contract is free
           </Badge>
@@ -156,10 +288,12 @@ function LocalStandaloneIntakeForm({ onBack }: { onBack: () => void }) {
           </Badge>
         </div>
       </div>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-blue-600" /> Project Details
+            <Zap className="w-5 h-5 text-blue-600" />
+            Project Details
           </CardTitle>
           <CardDescription>Tell us about your project and we'll prepare the perfect negotiation room</CardDescription>
         </CardHeader>
@@ -174,17 +308,20 @@ function LocalStandaloneIntakeForm({ onBack }: { onBack: () => void }) {
                     <FormLabel className="text-base font-medium">Describe your project</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="I need a logo designed for my startup restaurant..."
+                        placeholder="I need a logo designed for my startup restaurant. Looking for something modern and clean that works well on both digital and print materials..."
                         className="min-h-[100px] resize-none"
                         {...field}
                         onChange={(e) => handleProjectDescriptionChange(e.target.value)}
                       />
                     </FormControl>
-                    <FormDescription>Be specific - our AI will use this to prepare the negotiation</FormDescription>
+                    <FormDescription>
+                      Be specific about what you need - our AI will use this to prepare the negotiation
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               {aiAnalysis && (
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <div className="flex items-start gap-3">
@@ -196,19 +333,22 @@ function LocalStandaloneIntakeForm({ onBack }: { onBack: () => void }) {
                       <p className="text-sm text-blue-800">{aiAnalysis}</p>
                       <div className="mt-2">
                         <Badge variant="outline" className="border-blue-300 text-blue-700">
-                          {detectedTemplate === "freelancer" ? "Freelancer Agreement" : "Agency Agreement"}
+                          {detectedTemplate === "freelancer"
+                            ? "Freelancer Services Agreement"
+                            : "Agency Services Agreement"}
                         </Badge>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
+
               <FormField
                 control={form.control}
                 name="userRole"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-base font-medium">What's your role?</FormLabel>
+                    <FormLabel className="text-base font-medium">What's your role in this project?</FormLabel>
                     <FormControl>
                       <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-2 gap-4">
                         <FormItem className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-gray-50">
@@ -235,18 +375,18 @@ function LocalStandaloneIntakeForm({ onBack }: { onBack: () => void }) {
                   </FormItem>
                 )}
               />
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="userName"
                   render={({ field }) => (
                     <FormItem>
-                      {" "}
-                      <FormLabel>Your name</FormLabel>{" "}
+                      <FormLabel>Your name</FormLabel>
                       <FormControl>
                         <Input placeholder="John Smith" {...field} />
-                      </FormControl>{" "}
-                      <FormMessage />{" "}
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -255,19 +395,20 @@ function LocalStandaloneIntakeForm({ onBack }: { onBack: () => void }) {
                   name="userEmail"
                   render={({ field }) => (
                     <FormItem>
-                      {" "}
-                      <FormLabel>Your email</FormLabel>{" "}
+                      <FormLabel>Your email</FormLabel>
                       <FormControl>
                         <Input placeholder="john@example.com" type="email" {...field} />
-                      </FormControl>{" "}
-                      <FormMessage />{" "}
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+
               <div className="border-t pt-6">
                 <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
-                  <Users className="w-5 h-5" /> Invite the other party
+                  <Users className="w-5 h-5" />
+                  Invite the other party
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
@@ -275,12 +416,11 @@ function LocalStandaloneIntakeForm({ onBack }: { onBack: () => void }) {
                     name="otherPartyEmail"
                     render={({ field }) => (
                       <FormItem>
-                        {" "}
-                        <FormLabel>Their email</FormLabel>{" "}
+                        <FormLabel>Their email</FormLabel>
                         <FormControl>
                           <Input placeholder="sarah@example.com" type="email" {...field} />
-                        </FormControl>{" "}
-                        <FormMessage />{" "}
+                        </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -289,12 +429,11 @@ function LocalStandaloneIntakeForm({ onBack }: { onBack: () => void }) {
                     name="otherPartyName"
                     render={({ field }) => (
                       <FormItem>
-                        {" "}
-                        <FormLabel>Their name (optional)</FormLabel>{" "}
+                        <FormLabel>Their name (optional)</FormLabel>
                         <FormControl>
                           <Input placeholder="Sarah Johnson" {...field} />
-                        </FormControl>{" "}
-                        <FormMessage />{" "}
+                        </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -304,34 +443,39 @@ function LocalStandaloneIntakeForm({ onBack }: { onBack: () => void }) {
                   name="personalMessage"
                   render={({ field }) => (
                     <FormItem className="mt-4">
-                      {" "}
-                      <FormLabel>Personal message (optional)</FormLabel>{" "}
+                      <FormLabel>Personal message (optional)</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Hi Sarah! Let's negotiate..."
+                          placeholder="Hi Sarah! I'd love to work with you on this project. Let's negotiate the terms together in our AI-assisted room..."
                           className="resize-none"
                           rows={3}
                           {...field}
                         />
-                      </FormControl>{" "}
-                      <FormDescription>Included in the invitation email</FormDescription> <FormMessage />{" "}
+                      </FormControl>
+                      <FormDescription>This will be included in the invitation email</FormDescription>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+
               <div className="pt-6">
                 <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
                   {isLoading ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Creating room...
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Creating your negotiation room...
                     </>
                   ) : (
                     <>
-                      Create Negotiation Room <ArrowRight className="w-4 h-4 ml-2" />
+                      Create Negotiation Room
+                      <ArrowRight className="w-4 h-4 ml-2" />
                     </>
                   )}
                 </Button>
-                <p className="text-sm text-gray-500 text-center mt-2">Both parties will receive an invitation</p>
+                <p className="text-sm text-gray-500 text-center mt-2">
+                  Both parties will receive an invitation to join the negotiation room
+                </p>
               </div>
             </form>
           </Form>
@@ -340,33 +484,30 @@ function LocalStandaloneIntakeForm({ onBack }: { onBack: () => void }) {
     </div>
   )
 }
-// --- END: StandaloneIntakeForm Code ---
 
-// --- START: StandaloneNegotiationRoom Code ---
-interface NegotiationMessage {
-  id: string
-  sender: "user" | "other_party" | "ai_mediator" | "ai_lawyer_user" | "ai_lawyer_other"
-  content: string
-  timestamp: Date
-  sectionId?: string
-}
-
-interface ContractSection {
-  id: string
-  title: string
-  status: "pending" | "discussing" | "agreed" | "conflicted"
-  order: number
-}
-
-const mockContractSections: ContractSection[] = [
-  { id: "1", title: "What We Are Creating", status: "discussing", order: 1 },
-  { id: "2", title: "Our Project Timeline", status: "pending", order: 2 },
-  { id: "3", title: "Investment & Returns", status: "pending", order: 3 },
-  // Add more sections as needed for demo
-]
-
-function LocalStandaloneNegotiationRoom({ onBack }: { onBack: () => void }) {
-  const [messages, setMessages] = useState<NegotiationMessage[]>([])
+function NegotiationRoomComponent({ onBack }: { onBack: () => void }) {
+  const [messages, setMessages] = useState<NegotiationMessage[]>([
+    {
+      id: "1",
+      sender: "ai_mediator",
+      content:
+        "Welcome to your negotiation room! I'm your AI Mediator, and I'll help guide you through creating fair terms for both parties. John and Sarah, let's start with the project scope.",
+      timestamp: new Date(),
+    },
+    {
+      id: "2",
+      sender: "ai_lawyer_user",
+      content:
+        "Hi John! I'm your personal AI lawyer. I'll help you understand each term and ensure your interests are protected throughout this negotiation.",
+      timestamp: new Date(),
+    },
+    {
+      id: "3",
+      sender: "other_party",
+      content: "Hi John! Excited to work on this project with you. The logo concept sounds great!",
+      timestamp: new Date(),
+    },
+  ])
   const [newMessage, setNewMessage] = useState("")
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0)
   const [mobileView, setMobileView] = useState<"chat" | "contract">("chat")
@@ -376,25 +517,6 @@ function LocalStandaloneNegotiationRoom({ onBack }: { onBack: () => void }) {
 
   const currentUser = { id: "user1", name: "John Smith", role: "client" as const }
   const otherParty = { id: "user2", name: "Sarah Johnson", role: "freelancer" as const }
-
-  useEffect(() => {
-    const welcomeMessages: NegotiationMessage[] = [
-      {
-        id: "1",
-        sender: "ai_mediator",
-        content: `Welcome! ${currentUser.name} and ${otherParty.name}, let's start with the project scope.`,
-        timestamp: new Date(),
-      },
-      {
-        id: "2",
-        sender: "ai_lawyer_user",
-        content: `Hi ${currentUser.name}! I'm your AI lawyer.`,
-        timestamp: new Date(),
-      },
-      { id: "3", sender: "other_party", content: "Hi John! Excited to start.", timestamp: new Date() },
-    ]
-    setMessages(welcomeMessages)
-  }, [])
 
   const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   useEffect(scrollToBottom, [messages])
@@ -414,7 +536,7 @@ function LocalStandaloneNegotiationRoom({ onBack }: { onBack: () => void }) {
       const aiResponse: NegotiationMessage = {
         id: (Date.now() + 1).toString(),
         sender: "ai_mediator",
-        content: "Interesting point. Let's explore that.",
+        content: "That's a great point! Let me help both parties understand the implications of this term...",
         timestamp: new Date(),
         sectionId: mockContractSections[currentSectionIndex]?.id,
       }
@@ -429,15 +551,25 @@ function LocalStandaloneNegotiationRoom({ onBack }: { onBack: () => void }) {
       case "other_party":
         return { name: otherParty.name, color: "bg-green-100", textColor: "text-green-800", icon: null }
       case "ai_mediator":
-        return { name: "AI Mediator", color: "bg-purple-100", textColor: "text-purple-800", icon: null }
+        return {
+          name: "AI Mediator",
+          color: "bg-purple-100",
+          textColor: "text-purple-800",
+          icon: <Sparkles className="w-3 h-3" />,
+        }
       case "ai_lawyer_user":
-        return { name: "Your AI Lawyer", color: "bg-blue-100", textColor: "text-blue-800", icon: null }
+        return {
+          name: "Your AI Lawyer",
+          color: "bg-blue-100",
+          textColor: "text-blue-800",
+          icon: <Shield className="w-3 h-3" />,
+        }
       case "ai_lawyer_other":
         return {
           name: `${otherParty.name}'s AI Lawyer`,
           color: "bg-green-100",
           textColor: "text-green-800",
-          icon: null,
+          icon: <Shield className="w-3 h-3" />,
         }
       default:
         return { name: "Unknown", color: "bg-gray-100", textColor: "text-gray-800", icon: null }
@@ -449,12 +581,12 @@ function LocalStandaloneNegotiationRoom({ onBack }: { onBack: () => void }) {
   const ViewModeToggle = () => (
     <div className="flex items-center gap-2 mb-4">
       <Button variant={viewMode === "desktop" ? "default" : "outline"} size="sm" onClick={() => setViewMode("desktop")}>
-        {" "}
-        <Monitor className="w-4 h-4 mr-2" /> Desktop{" "}
+        <Monitor className="w-4 h-4 mr-2" />
+        Desktop
       </Button>
       <Button variant={viewMode === "mobile" ? "default" : "outline"} size="sm" onClick={() => setViewMode("mobile")}>
-        {" "}
-        <Smartphone className="w-4 h-4 mr-2" /> Mobile{" "}
+        <Smartphone className="w-4 h-4 mr-2" />
+        Mobile
       </Button>
     </div>
   )
@@ -491,16 +623,16 @@ function LocalStandaloneNegotiationRoom({ onBack }: { onBack: () => void }) {
                 className="flex-1 rounded-none"
                 onClick={() => setMobileView("chat")}
               >
-                {" "}
-                <MessageSquare className="w-4 h-4 mr-2" /> Chat{" "}
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Chat
               </Button>
               <Button
                 variant={mobileView === "contract" ? "default" : "ghost"}
                 className="flex-1 rounded-none"
                 onClick={() => setMobileView("contract")}
               >
-                {" "}
-                <FileText className="w-4 h-4 mr-2" /> Contract{" "}
+                <FileText className="w-4 h-4 mr-2" />
+                Contract
               </Button>
             </div>
           </div>
@@ -545,8 +677,7 @@ function LocalStandaloneNegotiationRoom({ onBack }: { onBack: () => void }) {
                       className="flex-1"
                     />
                     <Button onClick={handleSendMessage} size="icon">
-                      {" "}
-                      <Send className="w-4 h-4" />{" "}
+                      <Send className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
@@ -558,7 +689,7 @@ function LocalStandaloneNegotiationRoom({ onBack }: { onBack: () => void }) {
                     <CardTitle className="text-lg">{currentSection?.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-gray-600 mb-4">Contract section details for mobile...</p>
+                    <p className="text-sm text-gray-600 mb-4">Contract section content and options will be displayed here for mobile users.</p>
                     <div className="flex justify-between">
                       <Button
                         variant="outline"
@@ -566,8 +697,8 @@ function LocalStandaloneNegotiationRoom({ onBack }: { onBack: () => void }) {
                         onClick={() => setCurrentSectionIndex(Math.max(0, currentSectionIndex - 1))}
                         disabled={currentSectionIndex === 0}
                       >
-                        {" "}
-                        <ChevronLeft className="w-4 h-4 mr-1" /> Prev{" "}
+                        <ChevronLeft className="w-4 h-4 mr-1" />
+                        Previous
                       </Button>
                       <Button
                         variant="outline"
@@ -577,8 +708,8 @@ function LocalStandaloneNegotiationRoom({ onBack }: { onBack: () => void }) {
                         }
                         disabled={currentSectionIndex === mockContractSections.length - 1}
                       >
-                        {" "}
-                        Next <ChevronRight className="w-4 h-4 ml-1" />{" "}
+                        Next
+                        <ChevronRight className="w-4 h-4 ml-1" />
                       </Button>
                     </div>
                   </CardContent>
@@ -601,14 +732,13 @@ function LocalStandaloneNegotiationRoom({ onBack }: { onBack: () => void }) {
         <div
           className={cn(
             "bg-white border-r transition-all duration-300",
-            leftPanelOpen ? "w-80" : "w-0 overflow-hidden",
+            leftPanelOpen ? "w-80" : "w-0 overflow-hidden"
           )}
         >
           <div className="p-4 border-b flex items-center justify-between">
             <h2 className="font-semibold">Contract Sections</h2>
             <Button variant="ghost" size="sm" onClick={() => setLeftPanelOpen(false)}>
-              {" "}
-              <X className="w-4 h-4" />{" "}
+              <X className="w-4 h-4" />
             </Button>
           </div>
           <ScrollArea className="h-[calc(700px-80px)]">
@@ -617,8 +747,8 @@ function LocalStandaloneNegotiationRoom({ onBack }: { onBack: () => void }) {
                 <div
                   key={section.id}
                   className={cn(
-                    "p-3 rounded-lg cursor-pointer",
-                    index === currentSectionIndex ? "bg-blue-100" : "hover:bg-gray-50",
+                    "p-3 rounded-lg cursor-pointer transition-colors",
+                    index === currentSectionIndex ? "bg-blue-100 border-blue-200" : "hover:bg-gray-50"
                   )}
                   onClick={() => setCurrentSectionIndex(index)}
                 >
@@ -633,247 +763,29 @@ function LocalStandaloneNegotiationRoom({ onBack }: { onBack: () => void }) {
             </div>
           </ScrollArea>
         </div>
+
         <div className="flex-1 flex flex-col">
-          <div className="bg-white border-b p-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {!leftPanelOpen && (
-                <Button variant="ghost" size="sm" onClick={() => setLeftPanelOpen(true)}>
-                  {" "}
-                  <Menu className="w-4 h-4" />{" "}
-                </Button>
-              )}
-              <div>
-                <h1 className="font-semibold">Negotiation Room</h1>
-                <p className="text-sm text-gray-500">
-                  Section {currentSectionIndex + 1}: {currentSection?.title}
-                </p>
+          <div className="bg-white border-b p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {!leftPanelOpen && (
+                  <Button variant="ghost" size="sm" onClick={() => setLeftPanelOpen(true)}>
+                    <Menu className="w-4 h-4" />
+                  </Button>
+                )}
+                <div>
+                  <h1 className="font-semibold">Negotiation Room</h1>
+                  <p className="text-sm text-gray-500">
+                    Section {currentSectionIndex + 1}: {currentSection?.title}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Monitor className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-500">Desktop Mode</span>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              {" "}
-              <Monitor className="w-4 h-4 text-gray-400" /> <span className="text-sm text-gray-500">
-                Desktop Mode
-              </span>{" "}
-            </div>
           </div>
+
           <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4 max-w-4xl mx-auto">
-              {messages.map((message) => {
-                const senderInfo = getSenderInfo(message.sender)
-                return (
-                  <div key={message.id} className="flex items-start gap-3">
-                    <div className={cn("w-10 h-10 rounded-full flex items-center justify-center", senderInfo.color)}>
-                      {senderInfo.icon || <span className="text-sm font-medium">{senderInfo.name.charAt(0)}</span>}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={cn("text-sm font-medium", senderInfo.textColor)}>{senderInfo.name}</span>
-                        <span className="text-xs text-gray-500">
-                          {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        </span>
-                      </div>
-                      <div className="bg-white rounded-lg p-3 shadow-sm border">
-                        <p className="text-sm text-gray-900">{message.content}</p>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-            <div ref={messagesEndRef} />
-          </ScrollArea>
-          <div className="bg-white border-t p-4">
-            <div className="max-w-4xl mx-auto flex gap-3">
-              <Input
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Discuss this section..."
-                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                className="flex-1"
-              />
-              <Button onClick={handleSendMessage}>
-                {" "}
-                <Send className="w-4 h-4 mr-2" /> Send{" "}
-              </Button>
-            </div>
-          </div>
-        </div>
-        <div className="w-80 bg-white border-l">
-          <div className="p-4 border-b">
-            <h2 className="font-semibold flex items-center gap-2">
-              <Users className="w-5 h-5" /> Participants
-            </h2>
-          </div>
-          <div className="p-4 space-y-4">
-            <div className="flex items-center gap-3">
-              {" "}
-              <Avatar>
-                <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
-              </Avatar>{" "}
-              <div className="flex-1">
-                <p className="font-medium">{currentUser.name}</p>
-                <p className="text-sm text-gray-500 capitalize">{currentUser.role}</p>
-              </div>{" "}
-              <Badge variant="secondary">You</Badge>{" "}
-            </div>
-            <Separator />
-            <div className="flex items-center gap-3">
-              {" "}
-              <Avatar>
-                <AvatarFallback>{otherParty.name.charAt(0)}</AvatarFallback>
-              </Avatar>{" "}
-              <div className="flex-1">
-                <p className="font-medium">{otherParty.name}</p>
-                <p className="text-sm text-gray-500 capitalize">{otherParty.role}</p>
-              </div>{" "}
-              <div className="w-2 h-2 bg-green-500 rounded-full" title="Online" />{" "}
-            </div>
-            <Separator />
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium text-gray-700">AI Assistants</h3>
-              {[
-                { name: "AI Mediator", icon: null, color: "bg-purple-100", desc: "Guides negotiation" },
-                { name: "Your AI Lawyer", icon: null, color: "bg-blue-100", desc: "Protects your interests" },
-                {
-                  name: `${otherParty.name}'s AI Lawyer`,
-                  icon: null,
-                  color: "bg-green-100",
-                  desc: "Protects their interests",
-                },
-              ].map((ai) => (
-                <div key={ai.name} className="flex items-center gap-3">
-                  <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", ai.color)}>{ai.icon}</div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{ai.name}</p>
-                    <p className="text-xs text-gray-500">{ai.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-// --- END: StandaloneNegotiationRoom Code ---
-
-// --- START: Main Demo Component ---
-type ViewMode = "landing" | "intake" | "negotiation"
-
-export default function ContractPlatformDemo() {
-  const [currentView, setCurrentView] = useState<ViewMode>("landing")
-
-  const handleBackToDemo = () => setCurrentView("landing")
-
-  if (currentView === "intake") {
-    return <LocalStandaloneIntakeForm onBack={handleBackToDemo} />
-  }
-
-  if (currentView === "negotiation") {
-    return <LocalStandaloneNegotiationRoom onBack={handleBackToDemo} />
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      <div className="max-w-6xl mx-auto p-6">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Agreemint</h1>
-          <p className="text-xl text-gray-600 mb-6">AI-assisted contract negotiation platform</p>
-          <div className="flex items-center justify-center gap-4">
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
-              🤝 AI-mediated negotiation
-            </Badge>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-              ⚖️ Personal AI lawyers
-            </Badge>
-            <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-              ✍️ Sign in one session
-            </Badge>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setCurrentView("intake")}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-blue-600" />
-                Smart Intake Form
-              </CardTitle>
-              <CardDescription>AI-powered contract creation that detects the right template.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-gray-600 list-disc list-inside mb-4">
-                <li>AI template detection</li>
-                <li>Smart project analysis</li>
-                <li>Automated invitation system</li>
-              </ul>
-              <Button className="w-full">
-                Try Intake Form <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-          <Card
-            className="hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => setCurrentView("negotiation")}
-          >
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-purple-600" />
-                Negotiation Room
-              </CardTitle>
-              <CardDescription>Real-time AI-assisted negotiation with mobile-responsive design.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-gray-600 list-disc list-inside mb-4">
-                <li>Desktop & mobile views</li>
-                <li>AI mediator & lawyers</li>
-                <li>Section-by-section flow</li>
-              </ul>
-              <Button className="w-full">
-                Enter Negotiation Room <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-        <Card className="bg-white/50 backdrop-blur">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-green-600" />
-              How It Works
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {[
-                { icon: "📝", title: "Describe Project", desc: "AI analyzes needs & selects template." },
-                { icon: "🤝", title: "Enter Room", desc: "Both parties join AI-assisted room." },
-                { icon: "💬", title: "Negotiate", desc: "AI guides, lawyers protect interests." },
-                { icon: "✍️", title: "Sign", desc: "Digital signatures complete contract." },
-              ].map((step) => (
-                <div key={step.title} className="text-center">
-                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <span className="text-xl">{step.icon}</span>
-                  </div>
-                  <h3 className="font-medium mb-1">{step.title}</h3>
-                  <p className="text-sm text-gray-600">{step.desc}</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-        <div className="text-center mt-12">
-          <p className="text-gray-600 mb-4">Ready to experience the future of contract negotiation?</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => setCurrentView("intake")}>
-              Start Your First Contract
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => setCurrentView("negotiation")}>
-              See Negotiation Room
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-// --- END: Main Demo Component ---
+            <div className="space-y-4 max-w\

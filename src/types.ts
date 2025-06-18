@@ -1,4 +1,4 @@
-// All types in one file to avoid import issues
+// All types consolidated in one file to avoid import issues
 export interface User {
   id: string
   email: string
@@ -108,4 +108,25 @@ export interface NegotiationEvent extends Identifiable, TimeStamped {
   data: Record<string, any>
   performedBy: PartyRole
   message?: string
+}
+
+// Negotiation Room Types
+export interface NegotiationMessage {
+  id: string
+  sender: "user" | "other_party" | "ai_mediator" | "ai_lawyer_user" | "ai_lawyer_other"
+  content: string
+  timestamp: Date
+  sectionId?: string
+}
+
+// Form Types
+export interface ContractIntakeForm {
+  projectDescription: string
+  userRole: "client" | "freelancer"
+  userEmail: string
+  userName: string
+  otherPartyEmail: string
+  otherPartyName?: string
+  personalMessage?: string
+  detectedTemplate: "freelancer" | "agency"
 }
