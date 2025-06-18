@@ -1,4 +1,4 @@
-import type { User, TimeStamped, Identifiable } from "@shared/types"
+import type { User, TimeStamped, Identifiable } from "../../types/shared"
 
 export type ContractStatus =
   | "draft"

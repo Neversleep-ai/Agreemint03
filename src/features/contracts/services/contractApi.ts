@@ -1,4 +1,4 @@
-import { apiClient } from "@shared/services/api/apiClient"
+import { apiClient } from "../../services/api/apiClient"
 import type {
   ContractResponse,
   ContractListParams,
@@ -6,7 +6,7 @@ import type {
   UpdateContractRequest,
   ContractSectionResponse,
 } from "../types"
-import type { PaginatedResponse } from "@shared/types"
+import type { PaginatedResponse } from "../../types/shared"
 
 // Pure API layer - no business logic, no transformations
 export const contractApi = {

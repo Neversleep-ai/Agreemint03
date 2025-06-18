@@ -14,8 +14,6 @@
     "@radix-ui/react-label": "latest",
     "@radix-ui/react-radio-group": "latest",
     "@radix-ui/react-separator": "latest",
-    "@shared/services": "latest",
-    "@shared/types": "latest",
     "@tanstack/react-query": "latest",
     "@tanstack/react-query-devtools": "latest",
     "@types/node": "latest",
