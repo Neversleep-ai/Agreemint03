@@ -20,13 +20,10 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    /* Path mapping */
+    /* Path mapping - simplified */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@shared/*": ["./src/shared/*"],
-      "@features/*": ["./src/features/*"],
-      "@app/*": ["./src/app/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"],
