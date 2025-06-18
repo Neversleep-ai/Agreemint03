@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   Loader2,
   Users,
@@ -689,7 +690,9 @@ function NegotiationRoomComponent({ onBack }: { onBack: () => void }) {
                     <CardTitle className="text-lg">{currentSection?.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-gray-600 mb-4">Contract section content and options will be displayed here for mobile users.</p>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Contract section content and options will be displayed here for mobile users.
+                    </p>
                     <div className="flex justify-between">
                       <Button
                         variant="outline"
@@ -732,7 +735,7 @@ function NegotiationRoomComponent({ onBack }: { onBack: () => void }) {
         <div
           className={cn(
             "bg-white border-r transition-all duration-300",
-            leftPanelOpen ? "w-80" : "w-0 overflow-hidden"
+            leftPanelOpen ? "w-80" : "w-0 overflow-hidden",
           )}
         >
           <div className="p-4 border-b flex items-center justify-between">
@@ -748,7 +751,7 @@ function NegotiationRoomComponent({ onBack }: { onBack: () => void }) {
                   key={section.id}
                   className={cn(
                     "p-3 rounded-lg cursor-pointer transition-colors",
-                    index === currentSectionIndex ? "bg-blue-100 border-blue-200" : "hover:bg-gray-50"
+                    index === currentSectionIndex ? "bg-blue-100 border-blue-200" : "hover:bg-gray-50",
                   )}
                   onClick={() => setCurrentSectionIndex(index)}
                 >
@@ -788,4 +791,57 @@ function NegotiationRoomComponent({ onBack }: { onBack: () => void }) {
           </div>
 
           <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4 max-w\
+            <div className="space-y-4 max-w-4xl">
+              {messages.map((message) => {
+                const senderInfo = getSenderInfo(message.sender)
+                return (
+                  <div key={message.id} className="flex items-start gap-3">
+                    <Avatar className="w-8 h-8">
+                      <AvatarFallback className={cn("text-xs", senderInfo.color, senderInfo.textColor)}>
+                        {senderInfo.icon || senderInfo.name.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={cn("text-sm font-medium", senderInfo.textColor)}>{senderInfo.name}</span>
+                        <span className="text-xs text-gray-500">
+                          {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      </div>
+                      <div className="bg-white rounded-lg p-3 shadow-sm border">
+                        <p className="text-sm text-gray-900">{message.content}</p>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            <div ref={messagesEndRef} />
+          </ScrollArea>
+
+          <div className="bg-white border-t p-4">
+            <div className="flex gap-3 max-w-4xl">
+              <Avatar className="w-8 h-8">
+                <AvatarFallback className="bg-blue-100 text-blue-800 text-xs">
+                  {currentUser.name.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 flex gap-2">
+                <Input
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type your message..."
+                  onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                  className="flex-1"
+                />
+                <Button onClick={handleSendMessage}>
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
